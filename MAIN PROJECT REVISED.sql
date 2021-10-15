@@ -131,7 +131,7 @@ END //
 DELIMITER ; 
 
 CREATE TABLE payment(
-    paymentID VARCHAR(20) PRIMARY KEY NOT NULL,
+    paymentID VARCHAR(10) PRIMARY KEY NOT NULL,
     customerID INT UNIQUE NOT NULL,
     paymenttype VARCHAR(10) NOT NULL,
     cardno INT UNIQUE NOT NULL, 
@@ -163,8 +163,8 @@ DELIMITER ;
 
 CREATE TABLE cart(
     cartid VARCHAR(10) PRIMARY KEY UNIQUE NOT NULL,
-    customerID VARCHAR(15) NOT NULL UNIQUE,
-    productID VARCHAR(10) NOT NULL UNIQUE,
+    customerID INT NOT NULL UNIQUE,
+    productID VARCHAR(10) UNIQUE,
     productSKU VARCHAR(20) NOT NULL UNIQUE, 
     price DECIMAL(4,2),
     quantity INT, 
@@ -173,10 +173,12 @@ CREATE TABLE cart(
     modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
     CONSTRAINT active CHECK (active IN ('active', 'notactive'))
 );
-ALTER TABLE cart ADD FOREIGN KEY (productID) REFERENCES product(productID);
+ALTER TABLE cart ADD FOREIGN KEY (productID) REFERENCES product(productID) ON DELETE SET NULL;
+ALTER TABLE cart ADD FOREIGN KEY (customerID) REFERENCES customers(customerID) ON DELETE CASCADE;
+
 
 CREATE TABLE customerorders(
-    orderID VARCHAR(15) NOT NULL UNIQUE,
+    orderID VARCHAR(10) NOT NULL UNIQUE,
     customerID INT UNIQUE NOT NULL,
     productID VARCHAR(20) UNIQUE NOT NULL,
     productName VARCHAR(100),
@@ -276,7 +278,7 @@ CREATE TABLE shippers(
 );
        
 CREATE TABLE supplier(
-    supplierID VARCHAR(20) PRIMARY KEY NOT NULL UNIQUE,
+    supplierID VARCHAR(10) PRIMARY KEY NOT NULL UNIQUE,
     supplierName VARCHAR(20) NOT NULL,
     supplierAddress VARCHAR(100) NOT NULL,
     supplierCity VARCHAR(20) NOT NULL,
@@ -292,7 +294,7 @@ CREATE TABLE supplier(
     dicount_type DECIMAL(2,2),
     INDEX supplierdetail(supplierName, supplierAddress, supplierCity, supplierEmail, supplierPhone)
 );
-ALTER TABLE supplier ADD FOREIGN KEY(productID) REFERENCES product(productID);
+ALTER TABLE supplier ADD FOREIGN KEY(productID) REFERENCES product(productID) ON DELETE SET NULL;
 
 DELIMITER //
 CREATE PROCEDURE supplier_list (INOUT supplier VARCHAR(100))
